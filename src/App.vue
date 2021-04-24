@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <div id="overlays">
-      <TitleScreen style="z-index: 9999" v-if="!bPlaying" @click="start" />
+    <div id="overlays" v-if="!bPlaying">
       <GameOver v-if="bGameOver" />
+      <TitleScreen v-if="!bPlaying" @start="start" />
     </div>
 
     <div id="capture" ref="capture" />
@@ -45,7 +45,12 @@ export default class App extends Vue {
     Tone.start();
   }
 
-  public async start(){
+  public start(){
+
+    this.toneStart()
+  }
+
+  public async toneStart(){
     await Tone.start()
   }
 

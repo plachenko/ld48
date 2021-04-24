@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
     <h1>Deeper and Deeper</h1>
+    <div @click="start">Start</div>
   </div>
 </template>
 
@@ -10,6 +11,9 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
+  private start(){
+    this.$emit('start')
+  }
 }
 </script>
 
