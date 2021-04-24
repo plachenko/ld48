@@ -1,9 +1,10 @@
 <template>
   <div id="armContainer">
-    <div id="arm" class="hello">
+    <div id="arm">
       <div id="sleeve" ref="sleeve">
         <div id="hand"></div>
       </div>
+      <canvas ref="chain" id="chain"></canvas>
     </div>
     <div id="watch" ref="watch"></div>
   </div>
@@ -13,13 +14,12 @@
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 
 @Component
-export default class HelloWorld extends Vue {
+export default class Arm extends Vue {
   $refs!: {
     sleeve: HTMLElement,
     watch: HTMLElement,
   }
 
-  @Prop() private msg!: string;
   @Prop() private position!: any;
 
   handPos: {x: number, y: number} = {x: 0, y: 0};
@@ -173,5 +173,14 @@ export default class HelloWorld extends Vue {
       left: 0px;
       top: 0px;
       z-index: 9999;
+    }
+
+    #chain{
+      background-color:#F00;
+      width: 100px;
+      height: 100px;
+      position: absolute;
+      left: 0px;
+      top: 0px;
     }
 </style>

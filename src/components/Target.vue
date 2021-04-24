@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div :style="styleObjInner" ref="target" id="inner" class="circ"></div>
-    <div :style="styleObj" ref="target" class="circ"></div>
+    <div ref="target" id="inner" class="circ"></div>
+    <div ref="target" class="circ"></div>
   </div>
 </template>
 

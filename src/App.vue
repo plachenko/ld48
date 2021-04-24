@@ -36,6 +36,10 @@ export default class App extends Vue {
 
       this.position = {x: left, y: top}
     });
+    el.addEventListener('contextmenu', (e) =>{
+      e.preventDefault();
+      return true;
+    })
   }
 
 }
