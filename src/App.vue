@@ -38,7 +38,7 @@ export default class App extends Vue {
     });
     el.addEventListener('contextmenu', (e) =>{
       e.preventDefault();
-      return true;
+      return false;
     })
   }
 
