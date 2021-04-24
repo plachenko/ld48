@@ -13,9 +13,26 @@
 <script lang="ts">
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 
-class position()
-class moveObj {
-  velocity = 
+class Pos {
+  x: number;
+  y: number;
+
+  constructor(x = 0, y = 0){
+    this.x = x; 
+    this.y = y;
+  }
+}
+
+class MoveObj {
+  pos: Pos;
+  vel: Pos;
+  off: Pos;
+
+  constructor(pos = new Pos(), vel= new Pos(), off = new Pos()){
+    this.pos = pos;
+    this.vel = vel;
+    this.off = off;
+  }
 }
 
 @Component
@@ -28,47 +45,19 @@ export default class Arm extends Vue {
 
   @Prop() private position!: any;
 
-  hand: any = {
-    position:{
-      x: 0,
-      y: 0,
-    },
-    velocity:{
-      x: 0,
-      y: 0,
-    },
-    offset: {
-      x: 75,
-      y: 0,
-    }
-  }
-
-  watch: any = {
-    position:{
-      x: 0,
-      y: 0,
-    },
-    vel:{
-      x: 0,
-      y: 0,
-    },
-    off: {
-      x: 75,
-      y: 0,
-    }
-  }
+  hand = new MoveObj();
+  watch = new MoveObj();
 
   prevTime = 0;
 
   @Watch('position')
   onPosChanged(val: {x: number, y:number}){
     this.renderPos(val.x, val.y, this.$refs.sleeve);
-    this.hand.Pos = val;
-    // this.renderPos(val.x, val.y, this.$refs.watch)
-    // this.renderWatch();
+    this.hand.pos = new Pos(val.x, val.y);
   }
 
   public renderWatch(): any{
+    /*
     const dt = performance.now() - this.prevTime;
     this.prevTime = performance.now();
 
@@ -144,6 +133,7 @@ export default class Arm extends Vue {
 
     watch.style.left = `${this.watch.position.x - this.watch.offset.x}px`;
     watch.style.top = `${this.watch.position.y + this.watch.offset.y}px`;
+  */
   }
 
   private drawChain(){
@@ -157,7 +147,7 @@ export default class Arm extends Vue {
       ctx.setLineDash([15, 3, 3, 3]);
       ctx.beginPath();
       ctx.moveTo(160,0);
-      ctx.lineTo(((this.watch.position.x - this.watch.offset.x) - (this.handPos.x - 115))*4, 250);
+      ctx.lineTo(((this.watch.pos.x - this.watch.off.x) - (this.hand.pos.x - 115))*4, 250);
       ctx.stroke();
       ctx.closePath();
     }
