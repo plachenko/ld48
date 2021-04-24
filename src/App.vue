@@ -1,22 +1,29 @@
 <template>
   <div id="app">
+    <div id="overlays">
+      <TitleScreen v-if="!bPlaying" />
+      <GameOver v-if="bGameOver" />
+    </div>
+
     <div id="capture" ref="capture" />
-    <Arm :position="position" />
+    <Arm :position="oPosition" />
     <Target :position="{x: 100, y: 100}" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
 import Arm from './components/Arm.vue';
 import Target from './components/Target.vue';
+import TitleScreen from './components/overlays/TitleScreen.vue';
+import GameOver from './components/overlays/GameOver.vue';
 
 @Component({
   components: {
-    HelloWorld,
     Arm,
-    Target
+    Target,
+    TitleScreen,
+    GameOver
   },
 })
 export default class App extends Vue {
@@ -25,7 +32,9 @@ export default class App extends Vue {
     capture: HTMLElement
   }
 
-  position: {x: number, y: number} = {x: 0, y: 0};
+  bPlaying = false;
+  bGameOver = false;
+  oPosition: {x: number, y: number} = {x: 0, y: 0};
 
   mounted(){
     const el: HTMLElement = this.$refs.capture
@@ -34,7 +43,7 @@ export default class App extends Vue {
       let top = e.offsetY;
       let left = e.offsetX;
 
-      this.position = {x: left, y: top}
+      this.oPosition = {x: left, y: top}
     });
     el.addEventListener('contextmenu', (e) =>{
       e.preventDefault();

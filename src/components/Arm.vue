@@ -115,7 +115,7 @@ export default class Arm extends Vue {
     ctx.setLineDash([5, 6]);
     ctx.beginPath();
     ctx.moveTo(160,0);
-    ctx.lineTo(((this.watch.position.x - this.watch.offset.x) - (this.handPos.x - 115))*4, this.watch.position.y);
+    ctx.lineTo(((this.watch.position.x - this.watch.offset.x) - (this.handPos.x - 115))*4, 300);
 
     ctx.stroke();
     ctx.closePath();
@@ -190,6 +190,7 @@ export default class Arm extends Vue {
       position: absolute;
       left: 0px;
       top: 0px;
+      border: 2px solid;
       z-index: 9999;
     }
 
