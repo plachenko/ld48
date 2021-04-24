@@ -13,6 +13,11 @@
 <script lang="ts">
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 
+class position()
+class moveObj {
+  velocity = 
+}
+
 @Component
 export default class Arm extends Vue {
   $refs!: {
@@ -23,8 +28,7 @@ export default class Arm extends Vue {
 
   @Prop() private position!: any;
 
-  handPos: {x: number, y: number} = {x: 0, y: 0};
-  watch: any = {
+  hand: any = {
     position:{
       x: 0,
       y: 0,
@@ -39,36 +43,56 @@ export default class Arm extends Vue {
     }
   }
 
+  watch: any = {
+    position:{
+      x: 0,
+      y: 0,
+    },
+    vel:{
+      x: 0,
+      y: 0,
+    },
+    off: {
+      x: 75,
+      y: 0,
+    }
+  }
+
   prevTime = 0;
 
   @Watch('position')
   onPosChanged(val: {x: number, y:number}){
     this.renderPos(val.x, val.y, this.$refs.sleeve);
-    this.handPos = val;
+    this.hand.Pos = val;
     // this.renderPos(val.x, val.y, this.$refs.watch)
     // this.renderWatch();
   }
 
   public renderWatch(): any{
-
-    const can = this.$refs.chain;
-    const ctx = can.getContext('2d');
-
-    const watch = this.$refs.watch;
-    const hand: HTMLElement = document.getElementById('hand') as HTMLElement;
-    const tensionY = .007;
-    const tensionX = .007;
-
-    const offset = 100;
-
     const dt = performance.now() - this.prevTime;
     this.prevTime = performance.now();
+
+    const watch = this.watch;
+    const hand = this.hand;
+
+    const watchEl = this.$refs.watch;
+    const hand: HTMLElement = document.getElementById('hand') as HTMLElement;
+
+    const tension = {
+      x: .007,
+      y: .007
+    }
+
+    const distance = {
+      x: this.hand.pos.x - this.watch.pos.x,
+      y: this.hand.pos.y - this.watch.pos.y,
+    }
 
     let dy = this.handPos.y - this.watch.position.y; 
     let dx = this.handPos.x - this.watch.position.x; 
 
-    this.watch.velocity.x += dx * tensionX; 
-    this.watch.velocity.y += dy * tensionY;
+    this.watch.velocity.x += dx * tension.x; 
+    this.watch.velocity.y += dy * tension.y;
 
     this.watch.position.x += this.watch.velocity.x * dt;
     // this.watch.position.y += this.watch.velocity.y * dt;
@@ -116,30 +140,42 @@ export default class Arm extends Vue {
       console.log(dis)
     }
 
-    ctx.clearRect(0, 0, 400, 150);
-
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "#440";
-    ctx.setLineDash([15, 3, 3, 3]);
-    ctx.beginPath();
-    ctx.moveTo(160,0);
-    ctx.lineTo(((this.watch.position.x - this.watch.offset.x) - (this.handPos.x - 115))*4, 250);
-
-    ctx.stroke();
-    ctx.closePath();
+    this.drawChain();
 
     watch.style.left = `${this.watch.position.x - this.watch.offset.x}px`;
     watch.style.top = `${this.watch.position.y + this.watch.offset.y}px`;
+  }
+
+  private drawChain(){
+    const can = this.$refs.chain;
+    const ctx = can.getContext('2d');
+
+    if(ctx){
+      ctx.clearRect(0, 0, 400, 150);
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = "#440";
+      ctx.setLineDash([15, 3, 3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(160,0);
+      ctx.lineTo(((this.watch.position.x - this.watch.offset.x) - (this.handPos.x - 115))*4, 250);
+      ctx.stroke();
+      ctx.closePath();
+    }
+  }
+
+  private watchStep(){
+    const step = 10;
 
     setTimeout(()=> {
-      window.requestAnimationFrame(this.renderWatch)
-    }, 10)
+      this.renderWatch();
+      window.requestAnimationFrame(this.watchStep)
+    }, step)
   }
 
   mounted() {
     this.$nextTick(()=>{
-      console.log(this.$refs.chain)
-      window.requestAnimationFrame(this.renderWatch);
+      this.renderWatch();
+      window.requestAnimationFrame(this.watchStep);
     })
   }
 
