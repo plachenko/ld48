@@ -3,8 +3,8 @@
     <div id="arm">
       <div id="sleeve" ref="sleeve">
         <div id="hand"></div>
+        <canvas ref="chain" id="chain"></canvas>
       </div>
-      <canvas ref="chain" id="chain"></canvas>
     </div>
     <div id="watch" ref="watch"></div>
   </div>
@@ -18,6 +18,7 @@ export default class Arm extends Vue {
   $refs!: {
     sleeve: HTMLElement,
     watch: HTMLElement,
+    chain: HTMLCanvasElement,
   }
 
   @Prop() private position!: any;
@@ -49,6 +50,10 @@ export default class Arm extends Vue {
   }
 
   public renderWatch(): any{
+
+    const can = this.$refs.chain;
+    const ctx = can.getContext('2d');
+
     const watch = this.$refs.watch;
     const hand: HTMLElement = document.getElementById('hand') as HTMLElement;
     const tensionY = .007;
@@ -103,6 +108,18 @@ export default class Arm extends Vue {
       this.watch.velocity.x = 0;
     }
 
+    ctx.clearRect(0, 0, 400, 150);
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#440";
+    ctx.setLineDash([5, 6]);
+    ctx.beginPath();
+    ctx.moveTo(160,0);
+    ctx.lineTo(((this.watch.position.x - this.watch.offset.x) - (this.handPos.x - 115))*4, this.watch.position.y);
+
+    ctx.stroke();
+    ctx.closePath();
+
     watch.style.left = `${this.watch.position.x - this.watch.offset.x}px`;
     watch.style.top = `${this.watch.position.y + this.watch.offset.y}px`;
 
@@ -113,6 +130,7 @@ export default class Arm extends Vue {
 
   mounted() {
     this.$nextTick(()=>{
+      console.log(this.$refs.chain)
       window.requestAnimationFrame(this.renderWatch);
     })
   }
@@ -176,11 +194,10 @@ export default class Arm extends Vue {
     }
 
     #chain{
-      background-color:#F00;
-      width: 100px;
-      height: 100px;
+      width: 140px;
+      height: 60px;
       position: absolute;
-      left: 0px;
-      top: 0px;
+      left: -100px;
+      top: 40px;
     }
 </style>
