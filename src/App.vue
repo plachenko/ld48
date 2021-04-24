@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <div id="overlays">
-      <TitleScreen v-if="!bPlaying" />
+      <TitleScreen style="z-index: 9999" v-if="!bPlaying" @click="start" />
       <GameOver v-if="bGameOver" />
     </div>
 
     <div id="capture" ref="capture" />
-    <Arm :position="oPosition" />
-    <Target :position="{x: 100, y: 100}" />
+    <Arm :position="oPosition" @hit="hitTarget" />
+    <Target :position="{x: 200, y: 200}" />
   </div>
 </template>
 
@@ -17,6 +17,7 @@ import Arm from './components/Arm.vue';
 import Target from './components/Target.vue';
 import TitleScreen from './components/overlays/TitleScreen.vue';
 import GameOver from './components/overlays/GameOver.vue';
+import * as Tone from 'tone';
 
 @Component({
   components: {
@@ -35,6 +36,18 @@ export default class App extends Vue {
   bPlaying = false;
   bGameOver = false;
   oPosition: {x: number, y: number} = {x: 0, y: 0};
+
+  public hitTarget(){
+    console.log('hit')
+
+    const synth = new Tone.Synth().toDestination();
+    synth.triggerAttackRelease("C4", "8n");
+    Tone.start();
+  }
+
+  public async start(){
+    await Tone.start()
+  }
 
   mounted(){
     const el: HTMLElement = this.$refs.capture

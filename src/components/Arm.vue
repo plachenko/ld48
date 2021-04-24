@@ -108,14 +108,22 @@ export default class Arm extends Vue {
       this.watch.velocity.x = 0;
     }
 
+    const disX = Math.pow((this.watch.position.x - 200), 2);
+    const disY = Math.pow((this.watch.position.y - 200), 2);
+    const dis = Math.sqrt(disX + disY);
+    if(dis < 10){
+      this.$emit('hit')
+      console.log(dis)
+    }
+
     ctx.clearRect(0, 0, 400, 150);
 
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 5;
     ctx.strokeStyle = "#440";
-    ctx.setLineDash([5, 6]);
+    ctx.setLineDash([15, 3, 3, 3]);
     ctx.beginPath();
     ctx.moveTo(160,0);
-    ctx.lineTo(((this.watch.position.x - this.watch.offset.x) - (this.handPos.x - 115))*4, 300);
+    ctx.lineTo(((this.watch.position.x - this.watch.offset.x) - (this.handPos.x - 115))*4, 250);
 
     ctx.stroke();
     ctx.closePath();
@@ -196,7 +204,7 @@ export default class Arm extends Vue {
 
     #chain{
       width: 140px;
-      height: 60px;
+      height: 100px;
       position: absolute;
       left: -100px;
       top: 40px;
