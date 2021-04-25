@@ -1,17 +1,21 @@
 <template>
   <div id="app">
     <div id="gameContainer">
+      <Capture @mEvent="mEvent" />
+      <Arm :position="oPosition" @hit="hitTarget" />
+    </div>
+    <!--
+    <div id="gameContainer">
       <div id="overlays" v-if="!bPlaying">
         <GameOver v-if="bGameOver" />
         <TitleScreen v-if="!bPlaying" @start="start" />
       </div>
 
       <div id="playContainer">
-        <div id="capture" ref="capture" />
-        <Arm :position="oPosition" @hit="hitTarget" />
         <Target :position="{x: 200, y: 200}" />
       </div>
     </div>
+    -->
   </div>
 </template>
 
@@ -22,13 +26,15 @@ import Target from './components/Target.vue';
 import TitleScreen from './components/overlays/TitleScreen.vue';
 import GameOver from './components/overlays/GameOver.vue';
 import * as Tone from 'tone';
+import Capture from './components/Capture.vue';
 
 @Component({
   components: {
     Arm,
     Target,
     TitleScreen,
-    GameOver
+    GameOver,
+    Capture
   },
 })
 export default class App extends Vue {
@@ -40,6 +46,10 @@ export default class App extends Vue {
   bPlaying = false;
   bGameOver = false;
   oPosition: {x: number, y: number} = {x: 0, y: 0};
+
+  private mEvent(e: any){
+    console.log(e);
+  }
 
   public hitTarget(){
     console.log('hit')
@@ -59,18 +69,7 @@ export default class App extends Vue {
   }
 
   mounted(){
-    const el: HTMLElement = this.$refs.capture
-
-    el.addEventListener('mousemove', (e)=> {
-      let top = e.offsetY;
-      let left = e.offsetX;
-
-      this.oPosition = {x: left, y: top}
-    });
-    el.addEventListener('contextmenu', (e) =>{
-      e.preventDefault();
-      return false;
-    })
+    //
   }
 
 }
@@ -99,21 +98,15 @@ html, body{
   display: flex;
   flex-flow: column;
   justify-content: center;
+  align-items: center;
   cursor: none;
   }
 
-#capture{
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  z-index: 9999;
-}
 
 #gameContainer{
-  background-color:#F00;
+  border: 2px solid;
   width: 500px;
   height: 500px;
+  position: relative;
   }
 </style>
