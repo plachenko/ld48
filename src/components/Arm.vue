@@ -21,6 +21,13 @@ class Pos {
     this.x = x; 
     this.y = y;
   }
+
+  public getDistance(pos: Pos){
+    const distX = this.x - pos.x;
+    const distY = this.y - pos.y;
+
+    return new Pos(distX, distY);
+  }
 }
 
 class MoveObj {
@@ -32,6 +39,73 @@ class MoveObj {
     this.pos = pos;
     this.vel = vel;
     this.off = off;
+  }
+
+  public getDistance(obj: MoveObj){
+    return this.pos.getDistance(obj.pos);
+  }
+}
+
+class SpringObj extends MoveObj {
+  private tensionVal = .007
+  private tension = new Pos(this.tensionVal, this.tensionVal);
+  private dampVal = .9;
+  private damp = new Pos(this.dampVal, this.dampVal);
+  
+  constructor(pos = new Pos(), vel= new Pos(), off = new Pos()){
+    super(pos, vel, off)
+  }
+
+  private checkOffset(obj: MoveObj){
+    const offsetVal = 100;
+    const offsetMax = {
+      x: offsetVal,
+      y: offsetVal 
+    }
+
+    const offsetMin = {
+      x: offsetVal,
+      y: offsetVal 
+    }
+
+    this.off.y = offsetMax.y;
+
+    if(this.pos.y >= obj.pos.y + offsetMax.y){
+      this.vel.y = 0;
+      this.pos.y = obj.pos.y + offsetMax.y;
+    }
+    if(this.pos.y <= obj.pos.y - offsetMin.y){
+      this.pos.y = obj.pos.y - offsetMin.y;
+      this.vel.y = 0;
+    }
+
+    if(this.pos.x >= obj.pos.x + offsetMax.x){
+      this.vel.x = 0;
+      this.pos.x = obj.pos.x + offsetMax.x;
+    }
+    if(this.pos.x <= obj.pos.x - offsetMin.x){
+      this.pos.x = obj.pos.x - offsetMin.x;
+      this.vel.x = 0;
+    }
+  }
+
+  public update(obj: MoveObj, dt: number){
+    this.checkOffset(obj);
+
+    const dist = obj.getDistance(this);
+
+    this.vel.x += dist.x * this.tension.x;
+    this.vel.y += dist.y * this.tension.y;
+
+    this.pos.x += this.vel.x * dt;
+    this.pos.y += this.vel.y * dt;
+
+    this.vel.x *= this.damp.x;
+    this.vel.y *= this.damp.y;
+
+    // this.pos.x -= this.off.x;
+    // this.pos.x = this.pos.x + this.off.x;
+    // this.pos.y = this.pos.y + this.off.y;
   }
 }
 
@@ -46,8 +120,7 @@ export default class Arm extends Vue {
   @Prop() private position!: any;
 
   hand = new MoveObj();
-  watch = new MoveObj();
-
+  watch = new SpringObj(new Pos(), new Pos(), new Pos(10, -475));
   prevTime = 0;
 
   @Watch('position')
@@ -57,31 +130,20 @@ export default class Arm extends Vue {
   }
 
   public renderWatch(): any{
-    /*
     const dt = performance.now() - this.prevTime;
     this.prevTime = performance.now();
 
+    const watchEl = this.$refs.watch;
     const watch = this.watch;
     const hand = this.hand;
 
-    const watchEl = this.$refs.watch;
-    const hand: HTMLElement = document.getElementById('hand') as HTMLElement;
+    watch.update(hand, dt);
 
-    const tension = {
-      x: .007,
-      y: .007
-    }
+    /*
 
-    const distance = {
-      x: this.hand.pos.x - this.watch.pos.x,
-      y: this.hand.pos.y - this.watch.pos.y,
-    }
+    let dy = hand.pos.y - this.watch.position.y; 
+    let dx = hand.pos.x - this.watch.position.x; 
 
-    let dy = this.handPos.y - this.watch.position.y; 
-    let dx = this.handPos.x - this.watch.position.x; 
-
-    this.watch.velocity.x += dx * tension.x; 
-    this.watch.velocity.y += dy * tension.y;
 
     this.watch.position.x += this.watch.velocity.x * dt;
     // this.watch.position.y += this.watch.velocity.y * dt;
@@ -90,36 +152,6 @@ export default class Arm extends Vue {
     this.watch.velocity.x *= .9;
     this.watch.velocity.y *= .9;
 
-    const offsetVal = 100;
-    const offsetMax = {
-      x: offsetVal,
-      y: offsetVal 
-    }
-
-    const offsetMin = {
-      x: offsetVal,
-      y: offsetVal 
-    }
-
-    this.watch.offset.y = offsetMax.y;
-
-    if(this.watch.position.y >= this.handPos.y + offsetMax.y){
-      this.watch.velocity.y = 0;
-      this.watch.position.y = this.handPos.y + offsetMax.y;
-    }
-    if(this.watch.position.y <= this.handPos.y - offsetMin.y){
-      this.watch.position.y = this.handPos.y - offsetMin.y;
-      this.watch.velocity.y = 0;
-    }
-
-    if(this.watch.position.x >= this.handPos.x + offsetMax.x){
-      this.watch.velocity.x = 0;
-      this.watch.position.x = this.handPos.x + offsetMax.x;
-    }
-    if(this.watch.position.x <= this.handPos.x - offsetMin.x){
-      this.watch.position.x = this.handPos.x - offsetMin.x;
-      this.watch.velocity.x = 0;
-    }
 
     const disX = Math.pow((this.watch.position.x - 200), 2);
     const disY = Math.pow((this.watch.position.y - 200), 2);
@@ -129,11 +161,12 @@ export default class Arm extends Vue {
       console.log(dis)
     }
 
+
+  */
     this.drawChain();
 
-    watch.style.left = `${this.watch.position.x - this.watch.offset.x}px`;
-    watch.style.top = `${this.watch.position.y + this.watch.offset.y}px`;
-  */
+    watchEl.style.left = `${watch.pos.x - watch.off.x}px`;
+    watchEl.style.top = `${watch.pos.y - watch.off.y}px`;
   }
 
   private drawChain(){
@@ -147,7 +180,8 @@ export default class Arm extends Vue {
       ctx.setLineDash([15, 3, 3, 3]);
       ctx.beginPath();
       ctx.moveTo(160,0);
-      ctx.lineTo(((this.watch.pos.x - this.watch.off.x) - (this.hand.pos.x - 115))*4, 250);
+      ctx.lineTo(this.watch.pos.x - (this.hand.pos.x - 115), 250);
+      // ctx.lineTo(((this.watch.pos.x - this.watch.off.x) - (this.hand.pos.x - 115))*4, 250);
       ctx.stroke();
       ctx.closePath();
     }

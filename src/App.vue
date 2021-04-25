@@ -1,13 +1,17 @@
 <template>
   <div id="app">
-    <div id="overlays" v-if="!bPlaying">
-      <GameOver v-if="bGameOver" />
-      <TitleScreen v-if="!bPlaying" @start="start" />
-    </div>
+    <div id="gameContainer">
+      <div id="overlays" v-if="!bPlaying">
+        <GameOver v-if="bGameOver" />
+        <TitleScreen v-if="!bPlaying" @start="start" />
+      </div>
 
-    <div id="capture" ref="capture" />
-    <Arm :position="oPosition" @hit="hitTarget" />
-    <Target :position="{x: 200, y: 200}" />
+      <div id="playContainer">
+        <div id="capture" ref="capture" />
+        <Arm :position="oPosition" @hit="hitTarget" />
+        <Target :position="{x: 200, y: 200}" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -106,4 +110,10 @@ html, body{
   top: 0px;
   z-index: 9999;
 }
+
+#gameContainer{
+  background-color:#F00;
+  width: 500px;
+  height: 500px;
+  }
 </style>
