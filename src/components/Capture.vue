@@ -17,16 +17,16 @@ export default class Capture extends Vue {
 
   mounted() {
     const el: HTMLElement = this.$refs.capture;
-    const offsetPadding = 50;
+    const offsetPadding = 30;
 
-    el.style.left = -1 * (offsetPadding * -1) + "px";
-    el.style.top = -1 * offsetPadding + "px";
+    el.style.left = (offsetPadding * -1) + "px";
+    el.style.top = (offsetPadding * -1) + "px";
     el.style.width = el.offsetWidth + (offsetPadding*2) + "px";
     el.style.height = el.offsetHeight + (offsetPadding*2) + "px";
 
     el.addEventListener('mousemove', (e)=> {
-      const x = e.offsetX;
-      const y = e.offsetY;
+      const x = e.offsetX - offsetPadding;
+      const y = e.offsetY - offsetPadding;
       const mPos = new Pos(x, y);
 
       this.$emit('mMovEvt', mPos);
@@ -56,6 +56,6 @@ export default class Capture extends Vue {
   position: absolute;
   z-index: 9999;
   /* background-color:rgba(233,0,0,.4); */
-  /* cursor: none; */
+  cursor: none;
   }
 </style>
