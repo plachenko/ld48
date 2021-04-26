@@ -3,14 +3,24 @@
     <div id="gameContainer">
       <Capture @mOutEvt="mOutEvt" @mInEvt="mInEvt" @mMovEvt="mMovEvt" />
 
+      <div v-show="bTitle" id="title" class="menu">
+        <div id="TitleText">
+          <span id="deep1">Deeper</span>
+          <span id="and">and</span>
+          <span id="deep2">Deeper</span>
+        </div>
+      </div>
+        <!--
       <transition
         @enter="onEnter"
         @leave="onLeave"
         >
+
         <div v-show="bPaused" id="pause" class="menu">
           <span>Pause</span>
         </div>
       </transition>
+        -->
 
       <div id="armContainer">
         <Arm ref="arm" :position="oPosition" @hit="hitTarget" />
@@ -59,6 +69,8 @@ export default class App extends Vue {
 
   bPaused = false;
   bPlaying = false;
+  bTitle =  true;
+
   bGameOver = false;
   oPosition: {x: number, y: number} = {x: 0, y: 0};
 
@@ -102,14 +114,13 @@ export default class App extends Vue {
     setTimeout(()=> {
       this.$refs.arm.update();
       window.requestAnimationFrame(this.step)
-      // if(!this.bPaused){
-      // }
     }, step)
   }
 
   mounted(){
     this.$nextTick(()=>{
       // this.renderWatch();
+      gsap.to('#title', {y: 0, duration: 1});
       window.requestAnimationFrame(this.step);
     });
   }
@@ -159,6 +170,16 @@ html, body{
     top: 0px;
   }
 
+  #title{
+    opacity: 1;
+  }
+  #title span{
+    display: inline-block;
+    margin: 0px 5px;
+  }
+  #title #titleText{
+    font-size: 2em;
+  }
   .menu{
     width: 100%;
     height: 100%;

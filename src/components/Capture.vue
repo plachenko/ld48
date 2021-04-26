@@ -55,7 +55,7 @@ export default class Capture extends Vue {
   height: 100%;
   position: absolute;
   z-index: 9999;
-  background-color:rgba(233,0,0,.4);
+  /*background-color:rgba(233,0,0,.4);*/
   cursor: none;
   }
 </style>

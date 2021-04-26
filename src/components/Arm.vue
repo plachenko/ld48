@@ -80,6 +80,8 @@ export default class Arm extends Vue {
   private drawChain(){
     const can = this.$refs.chain;
     const ctx = can.getContext('2d');
+    const midX = 150;
+    const dist = this.handOff.getDistance(this.watch).x * 4;
 
     if(ctx){
       ctx.clearRect(0, 0, 400, 150);
@@ -87,8 +89,8 @@ export default class Arm extends Vue {
       ctx.strokeStyle = "#440";
       ctx.setLineDash([15, 3, 3, 3]);
       ctx.beginPath();
-      ctx.moveTo(this.hand.pos.x,0);
-      ctx.lineTo(this.watch.pos.x, 250);
+      ctx.moveTo(midX,0);
+      ctx.lineTo(midX-dist, 250);
       ctx.stroke();
       ctx.closePath();
     }

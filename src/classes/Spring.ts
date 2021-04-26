@@ -12,16 +12,40 @@ export class MoveObj {
   public getDistance(obj: MoveObj){
     return this.pos.getDistance(obj.pos);
   }
+}
 
-  /*
-  public update(dt = 0){
-    this.pos = this.
+export class SpringConfiguration{
+  public Mass : number;
+  public Tension : number;
+  public Friction : number;
+  public Precision : number;
+  public Clamp : boolean;
+  
+  constructor(Mass : number, Tension : number, Friction : number, Precision : number, Clamp : boolean){
+    this.Mass = Mass;
+    this.Tension = Tension;
+    this.Friction = Friction;
+    this.Precision = Precision;
+    this.Clamp = Clamp;
   }
-  */
+}
+
+export class SpringState{
+  public Target : number;
+  public Current : number;
+  public Velocity : number;
+  public Resting : boolean;
+  
+  constructor(Target : number, Current : number, Velocity : number){
+    this.Target = Target;
+    this.Current = Current;
+    this.Velocity = Velocity;
+    this.Resting = false;
+  }
 }
 
 export class SpringObj extends MoveObj {
-  private springConfiguration = new SpringConfiguration(.02, 1.6, .05, 100, true);
+  private springConfiguration = new SpringConfiguration(.01, 1.4, .04, 30, true);
   private xSpring: Spring;
   private ySpring: Spring;
   
@@ -38,10 +62,10 @@ export class SpringObj extends MoveObj {
 
     this.xSpring.Update(dt);
     this.ySpring.Update(dt);
-    // console.log(`[dt ]]`);
-    // console.log(`[xSpring ${this.xSpring.GetValue()}], [ySpring ${this.ySpring.GetValue()}]`);
+
     this.pos.x = this.xSpring.GetValue();
-    this.pos.y = this.ySpring.GetValue();
+    // this.pos.y = this.ySpring.GetValue();
+    this.pos.y = target.pos.y;
   }
 }
 
@@ -83,6 +107,7 @@ export class Spring {
     const force = -this.config.Tension * (this.state.Current - this.state.Target);
     const damping = -this.config.Friction * this.state.Velocity;
     const acceleration = (force + damping) / this.config.Mass;
+
     //update our velocity and position
     this.state.Velocity = this.state.Velocity + (acceleration * deltaTime);
     this.state.Current = this.state.Current + (this.state.Velocity * deltaTime);
@@ -125,35 +150,5 @@ export class Spring {
         }
     }
     this.state.Resting = false;
-  }
-}
-
-export class SpringConfiguration{
-  public Mass : number;
-  public Tension : number;
-  public Friction : number;
-  public Precision : number;
-  public Clamp : boolean;
-  
-  constructor(Mass : number, Tension : number, Friction : number, Precision : number, Clamp : boolean){
-    this.Mass = Mass;
-    this.Tension = Tension;
-    this.Friction = Friction;
-    this.Precision = Precision;
-    this.Clamp = Clamp;
-  }
-}
-
-export class SpringState{
-  public Target : number;
-  public Current : number;
-  public Velocity : number;
-  public Resting : boolean;
-  
-  constructor(Target : number, Current : number, Velocity : number){
-    this.Target = Target;
-    this.Current = Current;
-    this.Velocity = Velocity;
-    this.Resting = false;
   }
 }
