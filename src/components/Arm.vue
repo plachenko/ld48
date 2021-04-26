@@ -15,7 +15,6 @@ import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 import Pos from '../classes/Pos';
 import {MoveObj, SpringObj} from '../classes/Spring';
 
-
 @Component
 export default class Arm extends Vue {
   $refs!: {
@@ -107,7 +106,7 @@ export default class Arm extends Vue {
     this.$nextTick(()=>{
       this.renderWatch();
       window.requestAnimationFrame(this.watchStep);
-    })
+    });
   }
 
   public renderPos(_x:number, _y:number, obj: HTMLElement){
@@ -168,7 +167,7 @@ export default class Arm extends Vue {
       left: 0px;
       top: 0px;
       border: 2px solid;
-      z-index: 9999;
+      z-index: 9997;
     }
 
     #chain{

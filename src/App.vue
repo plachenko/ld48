@@ -1,8 +1,20 @@
 <template>
   <div id="app">
     <div id="gameContainer">
-      <Capture @mEvent="mEvent" />
-      <Arm :position="oPosition" @hit="hitTarget" />
+      <Capture @mOutEvt="mOutEvt" @mInEvt="mInEvt" @mMovEvt="mMovEvt" />
+
+      <transition
+        @enter="onEnter"
+        @leave="onLeave"
+        >
+        <div v-show="bPaused" id="pause" class="menu">
+          <span>Pause</span>
+        </div>
+      </transition>
+
+      <div id="armContainer">
+        <Arm :position="oPosition" @hit="hitTarget" />
+      </div>
     </div>
     <!--
     <div id="gameContainer">
@@ -27,6 +39,7 @@ import TitleScreen from './components/overlays/TitleScreen.vue';
 import GameOver from './components/overlays/GameOver.vue';
 import * as Tone from 'tone';
 import Capture from './components/Capture.vue';
+import gsap from 'gsap';
 
 @Component({
   components: {
@@ -43,29 +56,43 @@ export default class App extends Vue {
     capture: HTMLElement
   }
 
+  bPaused = false;
   bPlaying = false;
   bGameOver = false;
   oPosition: {x: number, y: number} = {x: 0, y: 0};
 
-  private mEvent(e: any){
-    console.log(e);
+  private mOutEvt(){
+    this.bPaused = true;
+  }
+
+  private mInEvt(){
+    this.bPaused = false;
+  }
+
+  private mMovEvt(e: any){
+    this.oPosition = e;
   }
 
   public hitTarget(){
-    console.log('hit')
-
     const synth = new Tone.Synth().toDestination();
     synth.triggerAttackRelease("C4", "8n");
     Tone.start();
   }
 
   public start(){
-
     this.toneStart()
   }
 
   public async toneStart(){
     await Tone.start()
+  }
+
+  private onEnter(){
+    gsap.from('#pause', {opacity: 0, duration: .3})
+  }
+
+  private onLeave(){
+    // gsap.from('#pause', {opacity: 1, duration: .3})
   }
 
   mounted(){
@@ -99,14 +126,37 @@ html, body{
   flex-flow: column;
   justify-content: center;
   align-items: center;
-  cursor: none;
   }
-
 
 #gameContainer{
   border: 2px solid;
   width: 500px;
   height: 500px;
   position: relative;
+  overflow: none;
   }
+  #armContainer{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+    left: 0px;
+    top: 0px;
+  }
+
+  .menu{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+    left: 0px;
+    top: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+    color: #FFF;
+    opacity: .8;
+    z-index: 9998;
+    }
 </style>
