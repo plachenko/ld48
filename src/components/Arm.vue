@@ -26,7 +26,7 @@ export default class Arm extends Vue {
   @Prop() private position!: any;
 
   hand = new MoveObj();
-  watch = new SpringObj(new Pos(), new Pos(), new Pos(10, -475));
+  watch = new SpringObj(...Array(1), new Pos(0, 100));
   prevTime = 0;
 
   @Watch('position')
@@ -49,7 +49,6 @@ export default class Arm extends Vue {
 
     let dy = hand.pos.y - this.watch.position.y; 
     let dx = hand.pos.x - this.watch.position.x; 
-
 
     this.watch.position.x += this.watch.velocity.x * dt;
     // this.watch.position.y += this.watch.velocity.y * dt;
@@ -87,7 +86,6 @@ export default class Arm extends Vue {
       ctx.beginPath();
       ctx.moveTo(160,0);
       ctx.lineTo(this.watch.pos.x - (this.hand.pos.x - 115), 250);
-      // ctx.lineTo(((this.watch.pos.x - this.watch.off.x) - (this.hand.pos.x - 115))*4, 250);
       ctx.stroke();
       ctx.closePath();
     }
@@ -111,10 +109,10 @@ export default class Arm extends Vue {
 
   public renderPos(_x:number, _y:number, obj: HTMLElement){
     const x = Math.round(_x);
-    const y = Math.round(_y);
+    const y = Math.round(_y) - 20;
 
-    obj.style.left = `${x - 15}px`;
-    obj.style.top = `${y + 5}px`;
+    obj.style.left = `${x}px`;
+    obj.style.top = `${y}px`;
     // console.log(this.$parent.$el)
     // const parentWidth = this;
 
@@ -146,8 +144,8 @@ export default class Arm extends Vue {
       border-bottom: 3px solid;
       position: absolute;
       background: #F00;
-      left: 143px;
-      top: 73px;
+      /* left: 143px; */
+      top: -1073px;
       background-color:#FFF;
     }
     #hand{

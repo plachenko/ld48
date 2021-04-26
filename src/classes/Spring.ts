@@ -27,7 +27,7 @@ export class SpringObj extends MoveObj {
   }
 
   private checkOffset(obj: MoveObj){
-    const offsetVal = 100;
+    const offsetVal = 10;
     const offsetMax = {
       x: offsetVal,
       y: offsetVal 
@@ -38,7 +38,7 @@ export class SpringObj extends MoveObj {
       y: offsetVal 
     }
 
-    this.off.y = offsetMax.y;
+    // this.off.y = offsetMax.y;
 
     if(this.pos.y >= obj.pos.y + offsetMax.y){
       this.vel.y = 0;
@@ -63,15 +63,16 @@ export class SpringObj extends MoveObj {
     this.checkOffset(obj);
 
     const dist = obj.getDistance(this);
+    console.log(dist);
 
-    this.vel.x += dist.x * this.tension.x;
-    this.vel.y += dist.y * this.tension.y;
+    // this.vel.x += dist.x * this.tension.x;
+    // this.vel.y += dist.y * this.tension.y;
 
-    this.pos.x += this.vel.x * dt;
-    this.pos.y += this.vel.y * dt;
+    // this.pos.x += this.vel.x * dt;
+    // this.pos.y += this.vel.y * dt;
 
-    this.vel.x *= this.damp.x;
-    this.vel.y *= this.damp.y;
+    // this.vel.x *= this.damp.x;
+    // this.vel.y *= this.damp.y;
 
     // this.pos.x -= this.off.x;
     // this.pos.x = this.pos.x + this.off.x;
