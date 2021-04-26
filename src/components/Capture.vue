@@ -12,23 +12,38 @@ export default class Capture extends Vue {
     capture: HTMLCanvasElement,
   }
 
-  @Prop() private position!: any;
+  @Prop() private position!: Pos;
+  @Prop() private scale !: Pos;
 
   mounted() {
     const el: HTMLElement = this.$refs.capture;
+    const offsetPadding = 50;
+
+    el.style.left = -1 * (offsetPadding * -1) + "px";
+    el.style.top = -1 * offsetPadding + "px";
+    el.style.width = el.offsetWidth + (offsetPadding*2) + "px";
+    el.style.height = el.offsetHeight + (offsetPadding*2) + "px";
 
     el.addEventListener('mousemove', (e)=> {
-      const x = e.offsetY;
-      const y = e.offsetX;
+      const x = e.offsetX;
+      const y = e.offsetY;
       const mPos = new Pos(x, y);
 
-      this.$emit('mEvent', mPos);
+      this.$emit('mMovEvt', mPos);
     });
 
     el.addEventListener('contextmenu', (e) =>{
       e.preventDefault();
       return false;
-    })
+    });
+
+    el.addEventListener('mouseover', (e) => {
+      this.$emit('mInEvt');
+    });
+
+    el.addEventListener('mouseout', (e) => {
+      this.$emit('mOutEvt');
+    });
   }
 }
 </script>
@@ -39,9 +54,8 @@ export default class Capture extends Vue {
   width: 100%;
   height: 100%;
   position: absolute;
-  left: 0px;
-  top: 0px;
   z-index: 9999;
-  background-color:rgba(233,0,0,.4);
+  /* background-color:rgba(233,0,0,.4); */
+  /* cursor: none; */
   }
 </style>
