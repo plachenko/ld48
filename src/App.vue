@@ -13,7 +13,7 @@
       </transition>
 
       <div id="armContainer">
-        <Arm :position="oPosition" @hit="hitTarget" />
+        <Arm ref="arm" :position="oPosition" @hit="hitTarget" />
       </div>
     </div>
     <!--
@@ -53,7 +53,8 @@ import gsap from 'gsap';
 export default class App extends Vue {
 
   $refs!: {
-    capture: HTMLElement
+    capture: HTMLElement,
+    arm: Arm
   }
 
   bPaused = false;
@@ -92,11 +93,25 @@ export default class App extends Vue {
   }
 
   private onLeave(){
-    // gsap.from('#pause', {opacity: 1, duration: .3})
+    this.step();
+  }
+
+  private step(){
+    const step = 10;
+
+    setTimeout(()=> {
+      this.$refs.arm.update();
+      window.requestAnimationFrame(this.step)
+      // if(!this.bPaused){
+      // }
+    }, step)
   }
 
   mounted(){
-    //
+    this.$nextTick(()=>{
+      // this.renderWatch();
+      window.requestAnimationFrame(this.step);
+    });
   }
 
 }

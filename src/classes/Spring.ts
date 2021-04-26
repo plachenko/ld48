@@ -2,80 +2,158 @@ import Pos from './Pos';
 
 export class MoveObj {
   pos: Pos;
-  vel: Pos;
   off: Pos;
 
   constructor(pos = new Pos(), vel= new Pos(), off = new Pos()){
     this.pos = pos;
-    this.vel = vel;
     this.off = off;
   }
 
   public getDistance(obj: MoveObj){
     return this.pos.getDistance(obj.pos);
   }
+
+  /*
+  public update(dt = 0){
+    this.pos = this.
+  }
+  */
 }
 
 export class SpringObj extends MoveObj {
-  private tensionVal = .007
-  private tension = new Pos(this.tensionVal, this.tensionVal);
-  private dampVal = .9;
-  private damp = new Pos(this.dampVal, this.dampVal);
+  private springConfiguration = new SpringConfiguration(.02, 1.6, .05, 100, true);
+  private xSpring: Spring;
+  private ySpring: Spring;
   
-  constructor(pos = new Pos(), vel= new Pos(), off = new Pos()){
-    super(pos, vel, off)
+  constructor(pos = new Pos(), off = new Pos()){
+    super(pos, off);
+    this.xSpring = new Spring(pos.x, this.springConfiguration);
+    this.ySpring = new Spring(pos.y, this.springConfiguration);
   }
 
-  private checkOffset(obj: MoveObj){
-    const offsetVal = 10;
-    const offsetMax = {
-      x: offsetVal,
-      y: offsetVal 
-    }
+  public update(target: MoveObj, dt: number){
+    this.xSpring.SetTarget(target.pos.x);
+    this.ySpring.SetTarget(target.pos.y);
+    dt =  dt / 1000;
 
-    const offsetMin = {
-      x: offsetVal,
-      y: offsetVal 
-    }
+    this.xSpring.Update(dt);
+    this.ySpring.Update(dt);
+    // console.log(`[dt ]]`);
+    // console.log(`[xSpring ${this.xSpring.GetValue()}], [ySpring ${this.ySpring.GetValue()}]`);
+    this.pos.x = this.xSpring.GetValue();
+    this.pos.y = this.ySpring.GetValue();
+  }
+}
 
-    // this.off.y = offsetMax.y;
+export class Spring {
+  private config : SpringConfiguration;
+  private state : SpringState;
 
-    if(this.pos.y >= obj.pos.y + offsetMax.y){
-      this.vel.y = 0;
-      this.pos.y = obj.pos.y + offsetMax.y;
-    }
-    if(this.pos.y <= obj.pos.y - offsetMin.y){
-      this.pos.y = obj.pos.y - offsetMin.y;
-      this.vel.y = 0;
-    }
-
-    if(this.pos.x >= obj.pos.x + offsetMax.x){
-      this.vel.x = 0;
-      this.pos.x = obj.pos.x + offsetMax.x;
-    }
-    if(this.pos.x <= obj.pos.x - offsetMin.x){
-      this.pos.x = obj.pos.x - offsetMin.x;
-      this.vel.x = 0;
-    }
+  constructor(initialValue:number, _config:SpringConfiguration){
+    this.config = _config;
+    this.state = new SpringState(initialValue, initialValue, 0);
+  }
+  
+  public IsResting()
+  {
+      return this.state.Resting;
   }
 
-  public update(obj: MoveObj, dt: number){
-    this.checkOffset(obj);
+  public GetValue()
+  {
+      return this.state.Current;
+  }
 
-    const dist = obj.getDistance(this);
-    console.log(dist);
+  public GetTarget()
+  {
+      return this.state.Target;
+  }
 
-    // this.vel.x += dist.x * this.tension.x;
-    // this.vel.y += dist.y * this.tension.y;
+  public GetVelocity()
+  {
+      return this.state.Velocity;
+  }
 
-    // this.pos.x += this.vel.x * dt;
-    // this.pos.y += this.vel.y * dt;
+  public SetTarget(value : number)
+  {
+      this.state.Target = value;
+  }
 
-    // this.vel.x *= this.damp.x;
-    // this.vel.y *= this.damp.y;
+  public Update(deltaTime : number){
+    const force = -this.config.Tension * (this.state.Current - this.state.Target);
+    const damping = -this.config.Friction * this.state.Velocity;
+    const acceleration = (force + damping) / this.config.Mass;
+    //update our velocity and position
+    this.state.Velocity = this.state.Velocity + (acceleration * deltaTime);
+    this.state.Current = this.state.Current + (this.state.Velocity * deltaTime);
 
-    // this.pos.x -= this.off.x;
-    // this.pos.x = this.pos.x + this.off.x;
-    // this.pos.y = this.pos.y + this.off.y;
+    if (this.config.Clamp)
+    {
+      //figure out if we're resting
+      console.log(`Difference: ${Math.abs(this.state.Target - this.state.Current)}`);
+
+      //T 100
+      //C 300
+      //p 100
+      //300 > 100 + 100 = 200
+
+      //300 < 100 - 100 = 0
+      
+      //D > P
+      //C = T
+      if(this.state.Current > this.state.Target + this.config.Precision)
+      {
+        this.state.Current = this.state.Target + this.config.Precision;
+        this.state.Velocity = 0;
+      }
+      else if(this.state.Current < this.state.Target - this.config.Precision)
+      {
+        this.state.Current = this.state.Target - this.config.Precision;
+        this.state.Velocity = 0;
+      }
+    }
+    else
+    {
+        //figure out if we're resting
+        if (Math.abs(this.state.Velocity) < this.config.Precision &&
+            Math.abs(this.state.Current - this.state.Target) < this.config.Precision)
+        {
+            this.state.Current = this.state.Target;
+            this.state.Velocity = 0;
+            this.state.Resting = true;
+            return;
+        }
+    }
+    this.state.Resting = false;
+  }
+}
+
+export class SpringConfiguration{
+  public Mass : number;
+  public Tension : number;
+  public Friction : number;
+  public Precision : number;
+  public Clamp : boolean;
+  
+  constructor(Mass : number, Tension : number, Friction : number, Precision : number, Clamp : boolean){
+    this.Mass = Mass;
+    this.Tension = Tension;
+    this.Friction = Friction;
+    this.Precision = Precision;
+    this.Clamp = Clamp;
+  }
+}
+
+export class SpringState{
+  public Target : number;
+  public Current : number;
+  public Velocity : number;
+  public Resting : boolean;
+  
+  constructor(Target : number, Current : number, Velocity : number){
+    this.Target = Target;
+    this.Current = Current;
+    this.Velocity = Velocity;
+    this.Resting = false;
   }
 }

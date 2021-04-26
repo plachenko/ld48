@@ -26,13 +26,16 @@ export default class Arm extends Vue {
   @Prop() private position!: any;
 
   hand = new MoveObj();
-  watch = new SpringObj(...Array(1), new Pos(0, 100));
+  handOff = new MoveObj(new Pos(this.hand.pos.x - 65, this.hand.pos.y+100));
+  sleeve = new MoveObj(...Array(0), new Pos(0, 30));
+  watch = new SpringObj(this.handOff.pos, new Pos(0, 100));
   prevTime = 0;
 
   @Watch('position')
   onPosChanged(val: {x: number, y:number}){
     this.renderPos(val.x, val.y, this.$refs.sleeve);
     this.hand.pos = new Pos(val.x, val.y);
+    this.handOff.pos = new Pos(val.x - 65, val.y+100);
   }
 
   public renderWatch(): any{
@@ -43,7 +46,7 @@ export default class Arm extends Vue {
     const watch = this.watch;
     const hand = this.hand;
 
-    watch.update(hand, dt);
+    watch.update(this.handOff, dt);
 
     /*
 
@@ -67,7 +70,7 @@ export default class Arm extends Vue {
     }
 
 
-  */
+    */
     this.drawChain();
 
     watchEl.style.left = `${watch.pos.x - watch.off.x}px`;
@@ -84,32 +87,28 @@ export default class Arm extends Vue {
       ctx.strokeStyle = "#440";
       ctx.setLineDash([15, 3, 3, 3]);
       ctx.beginPath();
-      ctx.moveTo(160,0);
-      ctx.lineTo(this.watch.pos.x - (this.hand.pos.x - 115), 250);
+      ctx.moveTo(this.hand.pos.x,0);
+      ctx.lineTo(this.watch.pos.x, 250);
       ctx.stroke();
       ctx.closePath();
     }
   }
 
-  private watchStep(){
-    const step = 10;
-
-    setTimeout(()=> {
-      this.renderWatch();
-      window.requestAnimationFrame(this.watchStep)
-    }, step)
+  public update(){
+    this.renderWatch();
   }
 
   mounted() {
+    /*
     this.$nextTick(()=>{
-      this.renderWatch();
       window.requestAnimationFrame(this.watchStep);
     });
+    */
   }
 
   public renderPos(_x:number, _y:number, obj: HTMLElement){
     const x = Math.round(_x);
-    const y = Math.round(_y) - 20;
+    const y = Math.round(_y) - this.sleeve.off.y;
 
     obj.style.left = `${x}px`;
     obj.style.top = `${y}px`;
