@@ -49,7 +49,6 @@ export default class Arm extends Vue {
     watch.update(this.handOff, dt);
 
     /*
-
     let dy = hand.pos.y - this.watch.position.y; 
     let dx = hand.pos.x - this.watch.position.x; 
 
@@ -68,8 +67,6 @@ export default class Arm extends Vue {
       this.$emit('hit')
       console.log(dis)
     }
-
-
     */
     this.drawChain();
 

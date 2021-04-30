@@ -69,7 +69,7 @@ export default class App extends Vue {
 
   bPaused = false;
   bPlaying = false;
-  bTitle =  true;
+  bTitle =  false;
 
   bGameOver = false;
   oPosition: {x: number, y: number} = {x: 0, y: 0};

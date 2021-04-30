@@ -45,7 +45,7 @@ export class SpringState{
 }
 
 export class SpringObj extends MoveObj {
-  private springConfiguration = new SpringConfiguration(.01, 1.4, .04, 30, true);
+  private springConfiguration = new SpringConfiguration(.01, 1.4, .04, 500, true);
   private xSpring: Spring;
   private ySpring: Spring;
   
@@ -64,8 +64,8 @@ export class SpringObj extends MoveObj {
     this.ySpring.Update(dt);
 
     this.pos.x = this.xSpring.GetValue();
-    // this.pos.y = this.ySpring.GetValue();
-    this.pos.y = target.pos.y;
+    this.pos.y = this.ySpring.GetValue();
+    // this.pos.y = target.pos.y;
   }
 }
 
@@ -115,7 +115,6 @@ export class Spring {
     if (this.config.Clamp)
     {
       //figure out if we're resting
-      console.log(`Difference: ${Math.abs(this.state.Target - this.state.Current)}`);
 
       //T 100
       //C 300
